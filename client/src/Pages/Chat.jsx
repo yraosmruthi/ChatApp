@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useUser } from "../context/userContext";
 import { useNavigate } from "react-router-dom";
 import { Bell } from "lucide-react";
 import NewGroupChat from "../components/NewGroupChat";
 import NewChat from "../components/NewChat";
 import { toast } from "react-toastify";
+import io from "socket.io-client"
+const endpoint = "http://localhost:3000"
 
 const Chat = () => {
   const { user, isLoggedIn, logout, loading } = useUser();
@@ -14,7 +16,10 @@ const Chat = () => {
   const [notifications, setNotifications] = useState([]);
   const [showGroupModal, setShowGroupModal] = useState(false);
   const [showNewChatModal, setShowNewChatModal] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
 
+  const chatBottomRef = useRef(null);
   const navigate = useNavigate();
 
   const fetchChats = async () => {
@@ -37,6 +42,50 @@ const Chat = () => {
     }
   };
 
+  const fetchMessages = async () => {
+    if (!selectedChat) return;
+
+    try {
+      const res = await fetch(
+        `http://localhost:3000/api/message/${selectedChat._id}`,
+        {
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+      setMessages(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to fetch messages", err);
+      toast.error("Failed to fetch messages");
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim()) return;
+
+    try {
+      const res = await fetch("http://localhost:3000/api/message", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: newMessage,
+          chatId: selectedChat._id,
+        }),
+      });
+
+      const data = await res.json();
+      setMessages((prev) => [...prev, data.message]);
+      setNewMessage("");
+    } catch (err) {
+      console.error("Error sending message:", err);
+      toast.error("Error sending message");
+    }
+  };
+
   useEffect(() => {
     if (!loading && !isLoggedIn) {
       navigate("/");
@@ -47,9 +96,17 @@ const Chat = () => {
     }
   }, [isLoggedIn, loading, user, navigate]);
 
+  useEffect(() => {
+    fetchMessages();
+  }, [selectedChat]);
+
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   const handleLogout = async () => {
     await logout();
-    toast.success("logged out successfully")
+    toast.success("Logged out successfully");
     navigate("/");
   };
 
@@ -183,9 +240,30 @@ const Chat = () => {
               </div>
 
               <div className="flex-grow bg-gray-800 rounded-lg p-4 overflow-y-auto mb-4">
-                <p className="text-gray-400 text-sm italic">
-                  This is where messages will go.
-                </p>
+                {messages.length === 0 ? (
+                  <p className="text-gray-400 text-sm italic">
+                    No messages yet. Start the conversation!
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {messages.map((msg) => (
+                      <div
+                        key={msg._id}
+                        className={`max-w-xs p-3 rounded-lg ${
+                          msg.sender._id === user._id
+                            ? "ml-auto bg-blue-600 text-white"
+                            : "mr-auto bg-gray-700 text-white"
+                        }`}
+                      >
+                        <p className="text-sm">{msg.content}</p>
+                        <p className="text-xs text-gray-300 mt-1 text-right">
+                          {msg.sender.name}
+                        </p>
+                      </div>
+                    ))}
+                    <div ref={chatBottomRef} />
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center">
@@ -193,8 +271,14 @@ const Chat = () => {
                   type="text"
                   placeholder="Type your message..."
                   className="flex-grow px-4 py-2 rounded-l-lg bg-gray-700 text-white focus:outline-none"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
                 />
-                <button className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-lg text-white">
+                <button
+                  className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-lg text-white"
+                  onClick={handleSendMessage}
+                >
                   Send
                 </button>
               </div>
