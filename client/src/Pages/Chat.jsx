@@ -5,8 +5,9 @@ import { Bell } from "lucide-react";
 import NewGroupChat from "../components/NewGroupChat";
 import NewChat from "../components/NewChat";
 import { toast } from "react-toastify";
-import io from "socket.io-client"
-const endpoint = "http://localhost:3000"
+import { io } from "socket.io-client";
+
+const endpoint = "http://localhost:3000";
 
 const Chat = () => {
   const { user, isLoggedIn, logout, loading } = useUser();
@@ -20,19 +21,17 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
 
   const chatBottomRef = useRef(null);
+  const socket = useRef(null);
+  const selectedChatCompare = useRef(null);
+
   const navigate = useNavigate();
 
   const fetchChats = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/chat", {
+      const res = await fetch(`${endpoint}/api/chat`, {
         method: "GET",
         credentials: "include",
       });
-
-      if (!res.ok) {
-        console.log("Failed to fetch chats");
-        return;
-      }
 
       const data = await res.json();
       setChats(Array.isArray(data) ? data : []);
@@ -46,15 +45,13 @@ const Chat = () => {
     if (!selectedChat) return;
 
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/message/${selectedChat._id}`,
-        {
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${endpoint}/api/message/${selectedChat._id}`, {
+        credentials: "include",
+      });
 
       const data = await res.json();
       setMessages(Array.isArray(data) ? data : []);
+      socket.current.emit("join room", selectedChat._id);
     } catch (err) {
       console.error("Failed to fetch messages", err);
       toast.error("Failed to fetch messages");
@@ -65,7 +62,7 @@ const Chat = () => {
     if (!newMessage.trim()) return;
 
     try {
-      const res = await fetch("http://localhost:3000/api/message", {
+      const res = await fetch(`${endpoint}/api/message`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -78,6 +75,7 @@ const Chat = () => {
       });
 
       const data = await res.json();
+      socket.current.emit("new message", data.message);
       setMessages((prev) => [...prev, data.message]);
       setNewMessage("");
     } catch (err) {
@@ -87,18 +85,35 @@ const Chat = () => {
   };
 
   useEffect(() => {
-    if (!loading && !isLoggedIn) {
-      navigate("/");
-    }
-
-    if (!loading && isLoggedIn) {
-      fetchChats();
-    }
+    fetchMessages();
+    selectedChatCompare.current = selectedChat;
+  })
+  
+  useEffect(() => {
+    if (!loading && !isLoggedIn) navigate("/");
+    if (!loading && isLoggedIn) fetchChats();
   }, [isLoggedIn, loading, user, navigate]);
 
   useEffect(() => {
-    fetchMessages();
-  }, [selectedChat]);
+    socket.current = io(endpoint);
+    socket.current.emit("setup", user);
+    socket.current.on("connected", () => console.log("Socket connected"));
+
+    socket.current.on("message recieved", (newMessageRecieved) => {
+      if (
+        !selectedChatCompare.current ||
+        selectedChatCompare.current._id !== newMessageRecieved.chat._id
+      ) {
+        setNotifications((prev) => [...prev, newMessageRecieved]);
+      } else {
+        setMessages((prev) => [...prev, newMessageRecieved]);
+      }
+    });
+
+    return () => {
+      socket.current.disconnect();
+    };
+  }, [user]);
 
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
