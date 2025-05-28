@@ -1,6 +1,7 @@
 const express=require('express')
 const app = express()
 const dotenv=require('dotenv')
+const http = require('http')
 const userAuth = require("./Routes/userAuth");
 const connectDb=require("./utils/db")
 const cookieParser = require("cookie-parser");
@@ -11,7 +12,7 @@ const fetchUsers = require("./Routes/fetchUsers")
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 
-const httpServer = createServer(app);
+const httpServer = http.createServer(app);
 
 dotenv.config()
 

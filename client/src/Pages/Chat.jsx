@@ -84,11 +84,23 @@ const Chat = () => {
     }
   };
 
+  // Helper to check if user is near bottom
+  const isUserNearBottom = () => {
+    const container = chatBottomRef.current?.parentNode;
+    if (!container) return false;
+
+    const threshold = 150; // pixels from bottom
+    return (
+      container.scrollHeight - container.scrollTop - container.clientHeight <
+      threshold
+    );
+  };
+
   useEffect(() => {
     fetchMessages();
     selectedChatCompare.current = selectedChat;
-  })
-  
+  }, [selectedChat]);
+
   useEffect(() => {
     if (!loading && !isLoggedIn) navigate("/");
     if (!loading && isLoggedIn) fetchChats();
@@ -116,7 +128,9 @@ const Chat = () => {
   }, [user]);
 
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (isUserNearBottom()) {
+      chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   const handleLogout = async () => {
