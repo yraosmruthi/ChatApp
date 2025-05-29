@@ -16,7 +16,7 @@ router.get("/me", async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
     const user = await User.findById(decoded.id).select("-password");
-    res.json(user);
+    res.json(user)
   } catch (err) {
     res.status(401).json({ message: "Invalid token" });
   }

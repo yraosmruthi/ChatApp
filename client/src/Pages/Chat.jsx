@@ -33,6 +33,11 @@ const Chat = () => {
         credentials: "include",
       });
 
+      if (!res.ok) {
+        console.error("Failed to fetch chats");
+        return;
+      }
+
       const data = await res.json();
       setChats(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -49,9 +54,18 @@ const Chat = () => {
         credentials: "include",
       });
 
+      if (!res.ok) {
+        console.error("Failed to fetch messages");
+        return;
+      }
+
       const data = await res.json();
       setMessages(Array.isArray(data) ? data : []);
-      socket.current.emit("join room", selectedChat._id);
+
+      // Only emit if socket is connected
+      if (socket.current && socket.current.connected) {
+        socket.current.emit("join room", selectedChat._id);
+      }
     } catch (err) {
       console.error("Failed to fetch messages", err);
       toast.error("Failed to fetch messages");
@@ -74,8 +88,18 @@ const Chat = () => {
         }),
       });
 
+      if (!res.ok) {
+        toast.error("Failed to send message");
+        return;
+      }
+
       const data = await res.json();
-      socket.current.emit("new message", data.message);
+
+      // Only emit if socket is connected
+      if (socket.current && socket.current.connected) {
+        socket.current.emit("new message", data.message);
+      }
+
       setMessages((prev) => [...prev, data.message]);
       setNewMessage("");
     } catch (err) {
@@ -84,32 +108,39 @@ const Chat = () => {
     }
   };
 
-  // Helper to check if user is near bottom
   const isUserNearBottom = () => {
     const container = chatBottomRef.current?.parentNode;
     if (!container) return false;
-
-    const threshold = 150; // pixels from bottom
+    const threshold = 150;
     return (
       container.scrollHeight - container.scrollTop - container.clientHeight <
       threshold
     );
   };
 
+  // Initialize socket only when user is authenticated
   useEffect(() => {
-    fetchMessages();
-    selectedChatCompare.current = selectedChat;
-  }, [selectedChat]);
+    if (!isLoggedIn || !user || loading) {
+      // Clean up socket if user is not authenticated
+      if (socket.current) {
+        socket.current.disconnect();
+        socket.current = null;
+      }
+      return;
+    }
 
-  useEffect(() => {
-    if (!loading && !isLoggedIn) navigate("/");
-    if (!loading && isLoggedIn) fetchChats();
-  }, [isLoggedIn, loading, user, navigate]);
+    // Initialize socket only if user is authenticated
+    console.log("Initializing socket for user:", user._id);
+    socket.current = io(endpoint, {
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+    });
 
-  useEffect(() => {
-    socket.current = io(endpoint);
     socket.current.emit("setup", user);
-    socket.current.on("connected", () => console.log("Socket connected"));
+
+    socket.current.on("connected", () => {
+      console.log("Socket connected for user:", user._id);
+    });
 
     socket.current.on("message recieved", (newMessageRecieved) => {
       if (
@@ -122,11 +153,42 @@ const Chat = () => {
       }
     });
 
-    return () => {
-      socket.current.disconnect();
-    };
-  }, [user]);
+    socket.current.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+    });
 
+    socket.current.on("disconnect", (reason) => {
+      console.log("Socket disconnected:", reason);
+    });
+
+    // Cleanup function
+    return () => {
+      if (socket.current) {
+        socket.current.disconnect();
+        socket.current = null;
+      }
+    };
+  }, [isLoggedIn, user, loading]);
+
+  // Handle navigation based on authentication
+  useEffect(() => {
+    if (!loading && !isLoggedIn) {
+      navigate("/");
+      return;
+    }
+
+    if (!loading && isLoggedIn && user) {
+      fetchChats();
+    }
+  }, [isLoggedIn, loading, user, navigate]);
+
+  // Handle selected chat changes
+  useEffect(() => {
+    fetchMessages();
+    selectedChatCompare.current = selectedChat;
+  }, [selectedChat]);
+
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (isUserNearBottom()) {
       chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -134,6 +196,12 @@ const Chat = () => {
   }, [messages]);
 
   const handleLogout = async () => {
+    // Disconnect socket before logout
+    if (socket.current) {
+      socket.current.disconnect();
+      socket.current = null;
+    }
+
     await logout();
     toast.success("Logged out successfully");
     navigate("/");
@@ -145,6 +213,11 @@ const Chat = () => {
         <p className="text-xl">Loading...</p>
       </div>
     );
+  }
+
+  // Redirect if not authenticated (this should rarely trigger due to useEffect above)
+  if (!isLoggedIn) {
+    return null;
   }
 
   return (
@@ -254,7 +327,7 @@ const Chat = () => {
           )}
         </div>
 
-        {/* Main Chat Window */}
+        {/* Chat Window */}
         <div className="w-2/3 p-6 flex flex-col">
           {selectedChat ? (
             <>
@@ -320,7 +393,7 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* Modal for New Group Chat */}
+      {/* Modals */}
       {showGroupModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg relative w-full max-w-md mx-auto">
@@ -342,7 +415,6 @@ const Chat = () => {
         </div>
       )}
 
-      {/* Modal for New Chat */}
       {showNewChatModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg relative w-full max-w-md mx-auto">
