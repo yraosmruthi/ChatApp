@@ -20,7 +20,12 @@ const userLogin = async (req, res) => {
     const result = await bcrypt.compare(password, userExist.password);
     if (result) {
       const token = generateToken(userExist);
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        httpOnly: true, // Prevents JavaScript access (XSS protection)
+        secure: false, // Set to true in production with HTTPS
+        sameSite: "lax", // Controls when cookies are sent (important for cross-origin)
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week (optional)
+      });
       return res.status(200).json({
         msg: "user logged in successfully",
         token,
