@@ -39,7 +39,16 @@ const Chat = () => {
       }
 
       const data = await res.json();
-      setChats(Array.isArray(data) ? data : []);
+      setChats(
+        Array.isArray(data)
+          ? data.sort(
+              (a, b) =>
+                new Date(b.latestMessage?.createdAt || 0) -
+                new Date(a.latestMessage?.createdAt || 0)
+            )
+          : []
+      );
+
     } catch (error) {
       console.error("Error fetching chats:", error);
       setChats([]);
@@ -101,6 +110,18 @@ const Chat = () => {
       }
 
       setMessages((prev) => [...prev, data.message]);
+      setChats((prev) => {
+        const updated = prev.map((chat) =>
+          chat._id === selectedChat._id
+            ? { ...chat, latestMessage: data.message }
+            : chat
+        );
+        return updated.sort(
+          (a, b) =>
+            new Date(b.latestMessage?.createdAt || 0) -
+            new Date(a.latestMessage?.createdAt || 0)
+        );
+      });
       setNewMessage("");
     } catch (err) {
       console.error("Error sending message:", err);
@@ -141,15 +162,41 @@ const Chat = () => {
     socket.current.on("connected", () => {
       console.log("Socket connected for user:", user._id);
     });
-
+   
     socket.current.on("message recieved", (newMessageRecieved) => {
       if (
         !selectedChatCompare.current ||
         selectedChatCompare.current._id !== newMessageRecieved.chat._id
       ) {
         setNotifications((prev) => [...prev, newMessageRecieved]);
+        setChats((prev) => {
+          const updated = prev.map((chat) =>
+            chat._id === newMessageRecieved.chat._id
+              ? { ...chat, latestMessage: newMessageRecieved }
+              : chat
+          );
+          return updated.sort(
+            (a, b) =>
+              new Date(b.latestMessage?.createdAt || 0) -
+              new Date(a.latestMessage?.createdAt || 0)
+          );
+        });
       } else {
         setMessages((prev) => [...prev, newMessageRecieved]);
+        setChats((prev) => {
+          const updated = prev.map((chat) =>
+            chat._id === newMessageRecieved.chat._id
+              ? { ...chat, latestMessage: newMessageRecieved }
+              : chat
+          );
+          return updated.sort(
+            (a, b) =>
+              new Date(b.latestMessage?.createdAt || 0) -
+              new Date(a.latestMessage?.createdAt || 0)
+          );
+        });
+        
+        
       }
     });
 
@@ -168,7 +215,7 @@ const Chat = () => {
         socket.current = null;
       }
     };
-  }, [isLoggedIn, user, loading]);
+  }, [isLoggedIn, user, loading,chats]);
 
   // Handle navigation based on authentication
   useEffect(() => {
@@ -227,11 +274,14 @@ const Chat = () => {
         <h1 className="text-3xl font-bold text-white">Talk-A-Tive</h1>
 
         <div className="flex items-center space-x-4 relative">
-          <button className="relative text-white hover:text-blue-400 transition">
+          <button
+            className="relative text-white hover:text-blue-400 transition"
+            onClick={() => setNotifications([])}
+          >
             <Bell className="w-6 h-6" />
             {notifications.length > 0 && (
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
-                {notifications.length}
+              <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+                {notifications.length > 9 ? "9+" : notifications.length}
               </span>
             )}
           </button>
@@ -298,31 +348,43 @@ const Chat = () => {
             <p className="text-gray-400">No chats found.</p>
           ) : (
             <div className="space-y-3">
-              {chats.map((chat) => {
-                const otherUser = chat.users.find(
-                  (u) => String(u._id) !== String(user._id)
-                );
-                const isActive = selectedChat?._id === chat._id;
+              {[...chats]
+                .sort((a, b) => {
+                  const aTime = new Date(
+                    a.latestMessage?.updatedAt || a.updatedAt || 0
+                  ).getTime();
+                  const bTime = new Date(
+                    b.latestMessage?.updatedAt || b.updatedAt || 0
+                  ).getTime();
+                  return bTime - aTime;
+                })
+                .map((chat) => {
+                  const otherUser = chat.users.find(
+                    (u) => String(u._id) !== String(user._id)
+                  );
+                  const isActive = selectedChat?._id === chat._id;
 
-                return (
-                  <div
-                    key={chat._id}
-                    onClick={() => setSelectedChat(chat)}
-                    className={`p-4 rounded-lg cursor-pointer transition ${
-                      isActive ? "bg-blue-700" : "bg-gray-700 hover:bg-gray-600"
-                    }`}
-                  >
-                    <p className="font-semibold text-white">
-                      {chat.isGroupChat
-                        ? chat.chatName
-                        : otherUser?.name || "Unknown User"}
-                    </p>
-                    <p className="text-sm text-gray-300 mt-1 truncate">
-                      {chat.latestMessage?.content || "No messages yet"}
-                    </p>
-                  </div>
-                );
-              })}
+                  return (
+                    <div
+                      key={chat._id}
+                      onClick={() => setSelectedChat(chat)}
+                      className={`p-4 rounded-lg cursor-pointer transition ${
+                        isActive
+                          ? "bg-blue-700"
+                          : "bg-gray-700 hover:bg-gray-600"
+                      }`}
+                    >
+                      <p className="font-semibold text-white">
+                        {chat.isGroupChat
+                          ? chat.chatName
+                          : otherUser?.name || "Unknown User"}
+                      </p>
+                      <p className="text-sm text-gray-300 mt-1 truncate">
+                        {chat.latestMessage?.content || "No messages yet"}
+                      </p>
+                    </div>
+                  );
+                })}
             </div>
           )}
         </div>
@@ -359,7 +421,10 @@ const Chat = () => {
                       >
                         <p className="text-sm">{msg.content}</p>
                         <p className="text-xs text-gray-300 mt-1 text-right">
-                          {msg.sender.name}
+                          {new Date(msg.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </p>
                       </div>
                     ))}
