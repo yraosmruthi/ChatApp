@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-export default function LoginSignupPage() {
+export default function Login() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("login");
   const [loginData, setLoginData] = useState({ email: "", password: "" });
@@ -49,6 +49,7 @@ export default function LoginSignupPage() {
       const result = await response.json()
       if(response.ok){
         toast.success("login success")
+        console.log("navigating to chat..")
         navigate("/chat")
         
       } else{
