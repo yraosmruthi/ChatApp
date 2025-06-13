@@ -5,9 +5,11 @@ const upload = require("../middlewares/multer")
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel")
 const protect = require("../middlewares/protect")
+const validate = require("../middlewares/validate-middleware");
+const { signupSchema, loginSchema } = require("../validators/auth-validate");
 
-router.route("/login").post(userLogin);
-router.route("/register").post(upload.single("pic"), userRegister);
+router.route("/login").post(validate(loginSchema),userLogin);
+router.route("/register").post(validate(signupSchema),upload.single("pic"), userRegister);
 router.route("/logout").post(userLogout)
 router.get("/me", async (req, res) => {
   const token = req.cookies.token;
