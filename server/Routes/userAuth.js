@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const AuthController=require('../controllers/AuthController')
+const {userLogin,userRegister,userLogout}=require('../controllers/AuthController')
 const upload = require("../middlewares/multer")
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel")
 const protect = require("../middlewares/protect")
 
-router.route("/login").post(AuthController.userLogin);
-router.route("/register").post(upload.single("pic"), AuthController.userRegister);
-router.route("/logout").post(AuthController.userLogout)
+router.route("/login").post(userLogin);
+router.route("/register").post(upload.single("pic"), userRegister);
+router.route("/logout").post(userLogout)
 router.get("/me", async (req, res) => {
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ message: "Unauthorized" });

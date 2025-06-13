@@ -70,7 +70,8 @@ export default function LoginSignupPage() {
    formData.append("name",signupData.name)
    formData.append("email", signupData.email);
    formData.append("password", signupData.password);
-   formData.append("confirmPassowrd", signupData.confirmPassword);
+   
+
    if(signupData.profilePicture){
     formData.append("pic", signupData.profilePicture);
    }
@@ -79,9 +80,10 @@ export default function LoginSignupPage() {
     method:"POST",
     body:formData
    })
-   const result = await response.json()                         
+   const result = await response.json()      
+   console.log(result)                   
    if(response.ok){
-    toast.sucess("Sign up success,now Login");
+    toast.success("Sign up success,now Login");
    }else{
     toast.error("invalid details")
    }
