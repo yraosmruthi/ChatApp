@@ -53,7 +53,11 @@ export default function Login() {
         navigate("/chat")
         
       } else{
-        toast.error("invalid details")
+        toast.error(
+          result?.extraDetails ||
+            result?.message ||
+            "Login failed. Please check your input."
+        );
       }
 
 
@@ -66,6 +70,11 @@ export default function Login() {
 
   const handleSignupSubmit =async () => {
    try{
+
+    if(signupData.confirmPassword !== signupData.password){
+      toast.error("Passwords do not match")
+      return;
+    }
 
    const formData = new FormData()
    formData.append("name",signupData.name)
@@ -86,7 +95,12 @@ export default function Login() {
    if(response.ok){
     toast.success("Sign up success,now Login");
    }else{
-    toast.error("invalid details")
+    console.log(result)
+    toast.error(
+      result?.extraDetails ||
+        result?.message ||
+        "Sign up failed. Please check your input."
+    );
    }
   }catch(error){
     toast.error("server error")
