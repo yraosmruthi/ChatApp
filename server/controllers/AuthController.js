@@ -41,14 +41,14 @@ const userLogin = async (req, res) => {
 
 const userRegister = async (req, res) => {
   try {
-    const { name, email, password, pic } = req.body;
+    const { name, email, password } = req.body;
     const file = req.file;
     const userExist = await User.findOne({ email });
     if (userExist) {
       return res.status(400).json("user already exist");
     }
-    let uploadImageUrl=""
-    if(file){
+    let uploadImageUrl = "";
+    if (file) {
       const result = await cloudinary.uploader.upload(file.path);
       uploadImageUrl = result.secure_url;
     }
@@ -60,18 +60,24 @@ const userRegister = async (req, res) => {
       password: hash,
       pic: uploadImageUrl,
     });
+    console.log(createUser)
     return res
       .status(200)
       .json({ msg: "user created successfully", createUser });
   } catch (error) {
-    console.log(error)
-    return res.status(401).json({ msg: "error" });
+    console.log(error);
+    return res.status(401).json({msg:"error"});
   }
 };
 
-const userLogout = async (req,res) =>  {
-  res.clearCookie("token")
-  res.status(200).json({msg:"logged out successfully"})
+const userLogout = async(req,res)=>{
+  try{
+   res.clearCookie("token")
+   res.status(200).json({msg:"logged out successfully"})
+  }catch(error){
+    console.log(error);
+    res.status(200).json({msg:"error"})
+  }
 }
 
-module.exports = { userLogin, userRegister, userLogout };
+module.exports = {userLogin,userRegister,userLogout}
