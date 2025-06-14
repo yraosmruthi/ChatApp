@@ -285,7 +285,7 @@ export default function Login() {
                 type="file"
                 name="profilePicture"
                 onChange={handleSignupChange}
-                className="w-full px-4 py-2 bg-gray-700 text-white rounded-md  border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 bg-gray-700 text-white rounded-md  focus:outline-none focus:ring-2 focus:ring-blue-500 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-500 hover:file:bg-blue-600"
               />
             </div>
 
