@@ -15,7 +15,7 @@ const signupSchema = z.object({
   password: z
    .string({ required_error: "password is required"})
    .trim()
-   .min(7,{message:"Atleast 7 characters"})
+   .min(4,{message:"Atleast 7 characters"})
    .max(1024,{message:"Maximum of 1024 characters"}),
 
   
@@ -30,7 +30,7 @@ const loginSchema = z.object({
   password: z
     .string({ required_error: "password is required" })
     .trim()
-    .min(7, { message: "Atleast 7 characters" })
+    .min(4, { message: "Atleast 7 characters" })
     .max(1024, { message: "Maximum of 1024 characters" }),
 });
 

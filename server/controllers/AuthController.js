@@ -80,4 +80,4 @@ const userLogout = async(req,res)=>{
   }
 }
 
-module.exports = {userLogin,userRegister,userLogout}
+module.exports = { userLogin,userRegister,userLogout }

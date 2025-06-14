@@ -34,20 +34,19 @@ app.get("/", (req, res) => {
   res.send("hey");
 });
 
-// Fixed Socket.IO configuration
 const io = new Server(server, {
   pingTimeout: 60000,
   pingInterval: 25000,
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:3000"], // Allow both URLs
+    origin: ["http://localhost:5173", "http://localhost:3000"], 
     credentials: true,
     methods: ["GET", "POST"],
   },
-  allowEIO3: true, // Backward compatibility
+  allowEIO3: true, 
   transports: ["websocket", "polling"],
 });
 
-// Store user data for cleanup
+
 const connectedUsers = new Map();
 
 // Add connection debugging
@@ -88,7 +87,7 @@ io.on("connection", (socket) => {
     });
   });
 
-  // Fixed disconnect handler
+
   socket.on("disconnect", () => {
     const userData = connectedUsers.get(socket.id);
     if (userData) {

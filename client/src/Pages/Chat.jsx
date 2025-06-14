@@ -81,6 +81,8 @@ const Chat = () => {
     }
   };
 
+
+
   const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
 
@@ -139,10 +141,10 @@ const Chat = () => {
     );
   };
 
-  // Initialize socket only when user is authenticated
+ 
   useEffect(() => {
     if (!isLoggedIn || !user || loading) {
-      // Clean up socket if user is not authenticated
+     
       if (socket.current) {
         socket.current.disconnect();
         socket.current = null;
@@ -150,7 +152,6 @@ const Chat = () => {
       return;
     }
 
-    // Initialize socket only if user is authenticated
     console.log("Initializing socket for user:", user._id);
     socket.current = io(endpoint, {
       withCredentials: true,
@@ -181,6 +182,12 @@ const Chat = () => {
               new Date(a.latestMessage?.createdAt || 0)
           );
         });
+        if(newMessageRecieved.chat.isGroupChat == false){
+        toast.info("new message recieved from "+newMessageRecieved.sender.name)
+        } else{
+        toast.info("new message recieved from "+newMessageRecieved.sender.name+" in "+newMessageRecieved.chat.chatName)
+        }
+        
       } else {
         setMessages((prev) => [...prev, newMessageRecieved]);
         setChats((prev) => {
@@ -254,6 +261,7 @@ const Chat = () => {
     navigate("/");
   };
 
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
@@ -271,7 +279,9 @@ const Chat = () => {
     <div className="min-h-screen bg-gray-900 text-white flex flex-col relative">
       {/* Top Nav */}
       <nav className="flex justify-between items-center px-6 py-4 bg-gray-800 shadow-lg">
-        <h1 className="text-3xl font-bold text-white">Talk-A-Tive</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 text-transparent bg-clip-text">
+          Connectify
+        </h1>
 
         <div className="flex items-center space-x-4 relative">
           <button
@@ -359,6 +369,9 @@ const Chat = () => {
                   return bTime - aTime;
                 })
                 .map((chat) => {
+                  const hasUnread = notifications.some(
+                    (msg) => msg.chat._id === chat._id
+                  );
                   const otherUser = chat.users.find(
                     (u) => String(u._id) !== String(user._id)
                   );
@@ -367,8 +380,13 @@ const Chat = () => {
                   return (
                     <div
                       key={chat._id}
-                      onClick={() => setSelectedChat(chat)}
-                      className={`p-4 rounded-lg cursor-pointer transition ${
+                      onClick={() => {
+                        setSelectedChat(chat);
+                        setNotifications((prev) =>
+                          prev.filter((msg) => msg.chat._id !== chat._id)
+                        );
+                      }}
+                      className={`relative p-4 rounded-lg cursor-pointer transition ${
                         isActive
                           ? "bg-blue-700"
                           : "bg-gray-700 hover:bg-gray-600"
@@ -382,6 +400,10 @@ const Chat = () => {
                       <p className="text-sm text-gray-300 mt-1 truncate">
                         {chat.latestMessage?.content || "No messages yet"}
                       </p>
+
+                      {hasUnread && (
+                        <span className="absolute top-1/2 right-4 -translate-y-1/2 h-2.5 w-2.5 bg-blue-500 rounded-full" />
+                      )}
                     </div>
                   );
                 })}
