@@ -111,7 +111,9 @@ export default function Login() {
   };
 
   const handleGuestLogin = () => {
-    setLoginData({email:"guest@example.com",password:"1234"})
+    const randomId = Math.floor(1000+Math.random()*9000);
+    const guestEmail = `guest${randomId}@example.com`
+    setLoginData({email:guestEmail,password:"1234"})
     console.log("Guest login requested");
     // Add guest login logic here
   };
@@ -119,8 +121,8 @@ export default function Login() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-black">
       <div className="w-full max-w-md p-6 rounded-lg bg-gray-900 shadow-xl">
-        <h1 className="text-3xl font-bold text-center text-white mb-6">
-          Talk-A-Tive
+        <h1 className="text-4xl  text-center font-bold bg-gradient-to-r from-blue-400 to-blue-800 text-transparent bg-clip-text mb-6">
+          Connectify
         </h1>
 
         <div className="flex mb-4">
