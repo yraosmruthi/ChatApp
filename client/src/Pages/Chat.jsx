@@ -6,6 +6,8 @@ import NewGroupChat from "../components/NewGroupChat";
 import NewChat from "../components/NewChat";
 import { toast } from "react-toastify";
 import { io } from "socket.io-client";
+import { FiTrash } from "react-icons/fi";
+
 
 const endpoint = "http://localhost:3000";
 
@@ -81,8 +83,6 @@ const Chat = () => {
     }
   };
 
-
-
   const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
 
@@ -141,7 +141,6 @@ const Chat = () => {
     );
   };
 
- 
   useEffect(() => {
     if (!isLoggedIn || !user || loading) {
      
@@ -261,6 +260,29 @@ const Chat = () => {
     navigate("/");
   };
 
+  const handleDelete = async (chatId) => {
+    try{
+       const response = await fetch(`${endpoint}/api/chat/delete/${chatId}`,{
+        method:"DELETE",
+        credentials:"include",
+        headers:{
+          "Content-Type":"application/json"
+        }
+       })
+
+       console.log("response from server for deletion",response)
+
+       if(!response.ok){
+        console.log("error",response) 
+        return;
+       }
+       const data = await response.json()
+       console.log("data in json",data)
+       setChats(prevChats => prevChats.filter(chat => chat._id !== chatId));
+    }catch(error){
+      console.log(error)
+    }
+  }
 
   if (loading) {
     return (
@@ -270,7 +292,6 @@ const Chat = () => {
     );
   }
 
-  // Redirect if not authenticated (this should rarely trigger due to useEffect above)
   if (!isLoggedIn) {
     return null;
   }
@@ -397,6 +418,20 @@ const Chat = () => {
                           ? chat.chatName
                           : otherUser?.name || "Unknown User"}
                       </p>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(chat._id);
+                        }}
+                        className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition-colors"
+                        title="Delete Chat"
+                      >
+                        <FiTrash
+                          size={18}
+                          className="hover:scale-125 transform transition-transform duration-200"
+                        />
+                      </button>
                       <p className="text-sm text-gray-300 mt-1 truncate">
                         {chat.latestMessage?.content || "No messages yet"}
                       </p>
