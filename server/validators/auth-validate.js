@@ -17,8 +17,6 @@ const signupSchema = z.object({
    .trim()
    .min(4,{message:"Atleast 7 characters"})
    .max(1024,{message:"Maximum of 1024 characters"}),
-
-  
 });
 
 const loginSchema = z.object({
