@@ -14,7 +14,6 @@ export default function Login() {
     profilePicture: null,
   });
 
-  // For password visibility toggling
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -124,8 +123,7 @@ export default function Login() {
         <h1 className="text-4xl  text-center font-bold bg-gradient-to-r from-blue-400 to-blue-800 text-transparent bg-clip-text mb-6">
           Connectify
         </h1>
-
-        <div className="flex mb-4">
+          <div className="flex mb-4">
           <button
             className={`flex-1 py-2 text-center ${
               activeTab === "login"
@@ -147,8 +145,7 @@ export default function Login() {
             Sign Up
           </button>
         </div>
-
-        {activeTab === "login" ? (
+          {activeTab === "login" ? (
           <div>
             <div className="mb-4">
               <label className="block text-white text-sm font-medium mb-2">

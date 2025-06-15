@@ -51,7 +51,6 @@ const io = new Server(server, {
 
 const connectedUsers = new Map();
 
-// Add connection debugging
 io.engine.on("connection_error", (err) => {
   console.log("Connection error:", err.req);
   console.log("Error code:", err.code);
@@ -64,7 +63,6 @@ io.on("connection", (socket) => {
   console.log("Client address:", socket.handshake.address);
 
   socket.on("setup", (userData) => {
-    // Store user data for this socket
     connectedUsers.set(socket.id, userData);
     socket.join(userData._id);
     socket.emit("connected");
@@ -88,7 +86,6 @@ io.on("connection", (socket) => {
       socket.in(user._id).emit("message recieved", newMessageRecieved);
     });
   });
-
 
   socket.on("disconnect", () => {
     const userData = connectedUsers.get(socket.id);
