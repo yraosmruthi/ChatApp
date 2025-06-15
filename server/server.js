@@ -19,6 +19,8 @@ app.use(
   cors({
     origin: "http://localhost:5173", // frontend URL
     credentials: true, // allow cookies to be sent
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ✅ include methods
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -40,7 +42,7 @@ const io = new Server(server, {
   cors: {
     origin: ["http://localhost:5173", "http://localhost:3000"], 
     credentials: true,
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST","DELETE","PATCH","PUT","OPTIONS"],
   },
   allowEIO3: true, 
   transports: ["websocket", "polling"],

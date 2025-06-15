@@ -1,5 +1,6 @@
 const Chat = require("../models/chatModel")
 const User = require("../models/userModel")
+const Message = require("../models/messageModel")
 
 const accessChat = async(req,res)=>{
     const {userId}=req.body
@@ -162,6 +163,27 @@ const removeFromGroup = async (req, res) => {
   }
 };
 
+const deleteChat = async (req,res) => {
+  try{
+  const chatId = req.params.chatid;
+  console.log("chat id",chatId)
+  const remove = await Chat.findByIdAndDelete(chatId)
+  if(!remove){
+    return res.status(404).json({msg:"chat not found"})
+  }
+  console.log("chat removed",remove)
 
+  const deleteMessage= await Message.deleteMany({ chat: chatId })
+  if(!deleteMessage){
+    res.status(200).json({ msg: "some message issue" });
+  }
+  console.log("message deleted",deleteMessage)
 
-module.exports = {accessChat,fetchChats,createGroupChat,renameGroup,addToGroup,removeFromGroup}
+  res.status(200).json({msg:"chat deleted successfully"})
+  }catch(error){
+    console.log(error)
+     res.status(500).json({msg:"backend error"})
+  }
+}
+
+module.exports = {accessChat,fetchChats,createGroupChat,renameGroup,addToGroup,removeFromGroup,deleteChat}
