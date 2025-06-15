@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 import { io } from "socket.io-client";
 import { FiTrash } from "react-icons/fi";
 
-
 const endpoint = "http://localhost:3000";
 
 const Chat = () => {
@@ -21,6 +20,7 @@ const Chat = () => {
   const [showNewChatModal, setShowNewChatModal] = useState(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const chatBottomRef = useRef(null);
   const socket = useRef(null);
@@ -284,6 +284,31 @@ const Chat = () => {
     }
   }
 
+   const handleDeleteAccount = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch("http://localhost:3000/api/auth/delete", {
+          method: "DELETE",
+          credentials: "include",
+        });
+  
+        if (!res.ok) {
+          const error = await res.json();
+          toast.error( "Failed to delete account.");
+          setLoading(false);
+          return;
+        }
+  
+        await logout();
+        toast.success("account deleted successfully")
+        navigate("/");
+      } catch (err) {
+        console.error(err);
+        toast.error("Something went wrong. Try again later.");
+        setLoading(false);
+      }
+    };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
@@ -305,6 +330,7 @@ const Chat = () => {
         </h1>
 
         <div className="flex items-center space-x-4 relative">
+          {/* Notification Bell */}
           <button
             className="relative text-white hover:text-blue-400 transition"
             onClick={() => setNotifications([])}
@@ -317,6 +343,7 @@ const Chat = () => {
             )}
           </button>
 
+          {/* Profile Dropdown */}
           <div className="relative">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -331,22 +358,60 @@ const Chat = () => {
             </button>
 
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-2 z-20">
-                <button
-                  onClick={() => {
-                    navigate("/profile");
-                    setDropdownOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-white hover:bg-gray-700"
-                >
-                  Profile
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 text-white hover:bg-gray-700"
-                >
+              <div className="absolute right-0 mt-2 w-64 bg-gray-900 border border-gray-700 rounded-lg shadow-xl z-30 p-4 space-y-4">
+                {/* User Info */}
+                <div className="flex items-center space-x-3 border-b border-gray-700 pb-3">
+                  <img
+                    src={user?.pic || "/default-profile.png"}
+                    alt="Profile"
+                    className="w-12 h-12 rounded-full border border-gray-600"
+                  />
+                  <div>
+                    <p className="font-semibold text-white">{user?.name}</p>
+                    <p className="text-gray-400 text-sm truncate">
+                      {user?.email}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 rounded hover:bg-blue-800 transition  mb-3 text-white"
+                  >
                   Logout
-                </button>
+                  </button>
+
+                  {!confirmDelete ? (
+                    <button
+                      onClick={() => setConfirmDelete(true)}
+                      className="w-full text-left px-4 py-2 rounded  hover:bg-red-800 transition text-white"
+                    >
+                     Delete My Account
+                    </button>
+                  ) : (
+                    <div className="space-y-2 text-center">
+                      <p className="text-sm text-red-400">
+                        Confirm delete? This can't be undone.
+                      </p>
+                      <div className="flex justify-center gap-4">
+                        <button
+                          onClick={handleDeleteAccount}
+                          disabled={loading}
+                          className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-white"
+                        >
+                          {loading ? "Deleting..." : "Yes"}
+                        </button>
+                        <button
+                          onClick={() => setConfirmDelete(false)}
+                          className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-white"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

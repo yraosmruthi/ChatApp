@@ -19,7 +19,6 @@ const UserProvider = ({ children }) => {
         setUser(null);
         return;
       }
-
       const data = await res.json();
       console.log("User fetched successfully:", data);
       setUser(data);

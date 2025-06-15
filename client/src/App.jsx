@@ -1,13 +1,10 @@
 import './App.css'
-import Profile from './Pages/Profile'
 import  Chat  from "./Pages/Chat";
 import Login from './Pages/Login';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Bounce, ToastContainer } from 'react-toastify';
 
 function App() {
-  
-
   return (
     <>
       <ToastContainer
@@ -25,7 +22,6 @@ function App() {
       />
 
       <Routes>
-        <Route path="/profile" element={<Profile />} />
         <Route path="/" element={<Login />} />
         <Route path="/chat" element={<Chat />} />
       </Routes>
