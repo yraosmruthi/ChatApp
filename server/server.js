@@ -10,7 +10,6 @@ const message = require("./Routes/Message");
 const fetchUsers = require("./Routes/fetchUsers");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
-
 const server = createServer(app);
 
 dotenv.config();
@@ -47,7 +46,6 @@ const io = new Server(server, {
   allowEIO3: true, 
   transports: ["websocket", "polling"],
 });
-
 
 const connectedUsers = new Map();
 

@@ -6,10 +6,10 @@ const NewChat = ({ onChatStarted }) => {
   const { user } = useUser();
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
-  
 
   const handleSearch = async (query) => {
     setSearch(query);
+    
     if (!query.trim()) {
       setResults([]);
       return;
