@@ -308,6 +308,10 @@ const Chat = () => {
         setLoading(false);
       }
     };
+  
+    const handleEdit = async () =>{
+      navigate("/edit")
+    }
 
   if (loading) {
     return (
@@ -376,10 +380,17 @@ const Chat = () => {
 
                 <div className="space-y-2">
                   <button
+                    onClick={handleEdit}
+                    className="w-full text-left px-4 py-2 rounded hover:bg-blue-800 transition  mb-3 text-white"
+                  >
+                    Edit Profile
+                  </button>
+
+                  <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 rounded hover:bg-blue-800 transition  mb-3 text-white"
                   >
-                  Logout
+                    Logout
                   </button>
 
                   {!confirmDelete ? (
@@ -387,7 +398,7 @@ const Chat = () => {
                       onClick={() => setConfirmDelete(true)}
                       className="w-full text-left px-4 py-2 rounded  hover:bg-red-800 transition text-white"
                     >
-                     Delete My Account
+                      Delete My Account
                     </button>
                   ) : (
                     <div className="space-y-2 text-center">

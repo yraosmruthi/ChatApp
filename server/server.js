@@ -8,6 +8,7 @@ const cors = require("cors");
 const chat = require("./Routes/Chat");
 const message = require("./Routes/Message");
 const fetchUsers = require("./Routes/fetchUsers");
+const EditProfile = require("./Routes/EditProfile")
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const server = createServer(app);
@@ -30,6 +31,7 @@ app.use("/api/auth", userAuth);
 app.use("/api/chat", chat);
 app.use("/api/message", message);
 app.use("/api/fetch", fetchUsers);
+app.use("/api/edit",EditProfile)
 
 app.get("/", (req, res) => {
   res.send("hey");
