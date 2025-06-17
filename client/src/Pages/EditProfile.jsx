@@ -129,15 +129,27 @@ export default function EditProfile() {
         </div>
 
         {/* Optional Cancel Button */}
-        <button
-          onClick={() => {
-            setNewName("");
-            setNewEmail("");
-          }}
-          className="mt-2 text-center text-sm text-gray-400 hover:text-gray-200 underline w-full"
-        >
-          Cancel
-        </button>
+
+        <div className="flex gap-60">
+          <button
+            onClick={() => {
+              setNewName("");
+              setNewEmail("");
+            }}
+            className="mt-2 text-center text-sm text-gray-400 hover:text-gray-200 underline w-full"
+          >
+            Reset
+          </button>
+
+          <button
+            onClick={() => {
+              Navigate("/chat");
+            }}
+            className="mt-2 text-center text-sm text-gray-400 hover:text-gray-200 underline w-full"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );
