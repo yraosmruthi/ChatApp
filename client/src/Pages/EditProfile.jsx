@@ -143,7 +143,9 @@ export default function EditProfile() {
 
           <button
             onClick={() => {
-              Navigate("/chat");
+             setNewName("");
+             setNewEmail("");
+             Navigate("/chat");
             }}
             className="mt-2 text-center text-sm text-gray-400 hover:text-gray-200 underline w-full"
           >
