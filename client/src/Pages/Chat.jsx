@@ -381,7 +381,7 @@ const Chat = () => {
                 <div className="space-y-2">
                   <button
                     onClick={handleEdit}
-                    className="w-full text-left px-4 py-2 rounded hover:bg-blue-800 transition  mb-3 text-white"
+                    className="w-full text-left px-4 py-2 rounded hover:bg-green-800 transition  mb-3 text-white"
                   >
                     Edit Profile
                   </button>
