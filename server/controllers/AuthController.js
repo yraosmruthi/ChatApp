@@ -51,7 +51,12 @@ const userRegister = async (req, res) => {
     if (file) {
       const result = await cloudinary.uploader.upload(file.path);
       uploadImageUrl = result.secure_url;
+
+      fs.unlink(file.path, (err) => {
+        if (err) console.log("Failed to delete local file:", err);
+      });
     }
+    
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
     const createUser = await User.create({

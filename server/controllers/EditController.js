@@ -1,4 +1,13 @@
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: "dzqsmgj6r",
+  api_key: "655415841471648",
+  api_secret: "A3PcjdSWokzJuXgSM14bTnlU7y0",
+});
+const fs = require("fs");
 const User = require("../models/userModel");
+const bcrypt = require("bcryptjs")
 
 const editName = async (req,res)=>{
     const {newName} = req.body
@@ -50,4 +59,70 @@ const editEmail = async (req, res) => {
     }
 };
 
-module.exports = {editName,editEmail}
+const editPic = async (req, res) => {
+  try {
+    console.log("req.file:", req.file);
+    console.log("req.user:", req.user);
+
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ msg: "No file provided" });
+    }
+
+    const result = await cloudinary.uploader.upload(file.path);
+    console.log("Cloudinary upload success:", result);
+
+    // Delete local file
+    fs.unlink(file.path, (err) => {
+      if (err) console.error("Failed to delete local file:", err);
+    });
+
+    const updatedPic = await User.findByIdAndUpdate(
+      req.user._id,
+      { pic: result.secure_url },
+      { new: true }
+    );
+
+    if (updatedPic) {
+      return res.status(200).json({ msg: "Pic updated successfully" });
+    } else {
+      return res.status(400).json({ msg: "Failed to update user" });
+    }
+  } catch (error) {
+    console.error("❌ Error in editPic:", error);
+    return res.status(500).json({ msg: "Backend error", error: error.message });
+  }
+};
+
+const editPassword = async (req,res) => {
+  const {oldPassword, newPassword} = req.body
+  try{
+  if(!oldPassword || !newPassword){
+    return res.json(400).json({msg:"fill all fields"})
+  }
+  const user = await User.findById(req.user._id)
+  const isMatch = await bcrypt.compare(oldPassword,user.password)
+
+  if(!isMatch){
+    return res.status(400).json({ msg: "invalid password" });
+  }
+  const salt = await bcrypt.genSalt(10);
+  const hash = await bcrypt.hash(newPassword,salt)
+
+  const response = await User.findByIdAndUpdate(
+    user,
+    {password:hash},
+    {new:true}
+  )
+  if(!response){
+    return res.status(400).json({ message: "password updation not successfull" });
+  }
+  return res.status(200).json({ message: "Password updated successfully" });
+}catch(error){
+  console.log(error)
+  res.status(500).json({ message: "backend error" });
+ }
+
+}
+
+module.exports = {editName,editEmail,editPic,editPassword}
