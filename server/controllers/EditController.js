@@ -1,10 +1,18 @@
 const cloudinary = require("cloudinary").v2;
 
+require("dotenv").config();
+
+const Cloudinary_cloud_name = process.env.CLOUD_NAME;
+const Cloudinary_api_key = process.env.API_KEY;
+const Cloudinary_api_secret = process.env.API_SECRET;
+
 cloudinary.config({
-  cloud_name: "dzqsmgj6r",
-  api_key: "655415841471648",
-  api_secret: "A3PcjdSWokzJuXgSM14bTnlU7y0",
+  cloud_name: Cloudinary_cloud_name,
+  api_key: Cloudinary_api_key,
+  api_secret: Cloudinary_api_secret,
+  secure: true,
 });
+
 const fs = require("fs");
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs")

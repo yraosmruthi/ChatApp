@@ -2,12 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useUser } from "../context/userContext";
+import { useEffect } from "react";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function Login() {
   const navigate = useNavigate();
   const { fetchUser } = useUser(); 
   const [activeTab, setActiveTab] = useState("login");
   const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [isGuestLogin, setIsGuestLogin] = useState(false);
   const [signupData, setSignupData] = useState({
     name: "",
     email: "",
@@ -15,7 +18,7 @@ export default function Login() {
     confirmPassword: "",
     profilePicture: null,
   });
-
+  const [loading,setLoading] = useState(false)
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -72,12 +75,12 @@ export default function Login() {
 
   const handleSignupSubmit =async () => {
    try{
-
+    
     if(signupData.confirmPassword !== signupData.password){
       toast.error("Passwords do not match")
       return;
     }
-
+    setLoading(true);
    const formData = new FormData()
    formData.append("name",signupData.name)
    formData.append("email", signupData.email);
@@ -99,25 +102,25 @@ export default function Login() {
    }else{
     console.log(result)
     toast.error(
-      result?.extraDetails ||
-        result?.message ||
+      result?.message || result?.extraDetails ||
         "Sign up failed. Please check your input."
     );
    }
   }catch(error){
     toast.error("server error")
     console.log(error)
-
-  }
-    // Add signup logic here
+   } finally{
+    setLoading(false);
+   }
   };
 
   const handleGuestLogin = () => {
     const randomId = Math.floor(1000+Math.random()*9000);
     const guestEmail = `guest${randomId}@example.com`
     setLoginData({email:guestEmail,password:"1234"})
+    setIsGuestLogin(true);
     console.log("Guest login requested");
-    // Add guest login logic here
+    
   };
 
   return (
@@ -126,7 +129,7 @@ export default function Login() {
         <h1 className="text-4xl  text-center font-bold bg-gradient-to-r from-blue-400 to-blue-800 text-transparent bg-clip-text mb-6">
           Connectify
         </h1>
-          <div className="flex mb-4">
+        <div className="flex mb-4">
           <button
             className={`flex-1 py-2 text-center ${
               activeTab === "login"
@@ -148,7 +151,7 @@ export default function Login() {
             Sign Up
           </button>
         </div>
-          {activeTab === "login" ? (
+        {activeTab === "login" ? (
           <div>
             <div className="mb-4">
               <label className="block text-white text-sm font-medium mb-2">
@@ -189,9 +192,23 @@ export default function Login() {
 
             <button
               onClick={handleLoginSubmit}
-              className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors mb-3"
-            >
-              Login
+              disabled={loading}
+              className={`w-full py-2 rounded mb-3 transition-colors flex items-center justify-center gap-2
+                ${
+                  loading
+                    ? "bg-blue-400 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600"
+                }
+              `}
+               >
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-blue-200 rounded-full animate-spin"></div>
+                  Logging in...
+                </>
+              ) : (
+                "Login"
+              )}
             </button>
 
             <button
@@ -291,9 +308,23 @@ export default function Login() {
 
             <button
               onClick={handleSignupSubmit}
-              className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              disabled={loading}
+              className={`w-full py-2 rounded transition-colors flex items-center justify-center gap-2
+                ${
+                  loading
+                    ? "bg-blue-400 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600"
+                }
+              `}
             >
-              Sign Up
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-blue-200 rounded-full animate-spin"></div>
+                  Signing Up...
+                </>
+              ) : (
+                "Sign Up"
+              )}
             </button>
           </div>
         )}
