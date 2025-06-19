@@ -1,6 +1,8 @@
+const dotenv = require("dotenv");
+dotenv.config();
+
 const express = require("express");
 const app = express();
-const dotenv = require("dotenv");
 const userAuth = require("./Routes/userAuth");
 const connectDb = require("./utils/db");
 const cookieParser = require("cookie-parser");
@@ -8,17 +10,15 @@ const cors = require("cors");
 const chat = require("./Routes/Chat");
 const message = require("./Routes/Message");
 const fetchUsers = require("./Routes/fetchUsers");
-const EditProfile = require("./Routes/EditProfile")
+const EditProfile = require("./Routes/EditProfile");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const server = createServer(app);
 
-dotenv.config();
-
 app.use(
   cors({
-    origin: "http://localhost:5173", 
-    credentials: true, 
+    origin: "http://localhost:5173",
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -31,7 +31,7 @@ app.use("/api/auth", userAuth);
 app.use("/api/chat", chat);
 app.use("/api/message", message);
 app.use("/api/fetch", fetchUsers);
-app.use("/api/edit",EditProfile)
+app.use("/api/edit", EditProfile);
 
 app.get("/", (req, res) => {
   res.send("hey");
@@ -41,11 +41,11 @@ const io = new Server(server, {
   pingTimeout: 60000,
   pingInterval: 25000,
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:3000"], 
+    origin: ["http://localhost:5173", "http://localhost:3000"],
     credentials: true,
-    methods: ["GET", "POST","DELETE","PATCH","PUT","OPTIONS"],
+    methods: ["GET", "POST", "DELETE", "PATCH", "PUT", "OPTIONS"],
   },
-  allowEIO3: true, 
+  allowEIO3: true,
   transports: ["websocket", "polling"],
 });
 
@@ -98,6 +98,20 @@ io.on("connection", (socket) => {
     }
   });
 });
+
+// const __dirname1 = path.resolve();
+
+// if (process.env.NODE_ENV === "production") {
+//   app.use(express.static(path.join(__dirname1, "/frontend/build")));
+
+//   app.get("*", (req, res) =>
+//     res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"))
+//   );
+// } else {
+//   app.get("/", (req, res) => {
+//     res.send("API is running..");
+//   });
+// }
 
 const PORT = process.env.PORT || 3000;
 connectDb().then(() => {

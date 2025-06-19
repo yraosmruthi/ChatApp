@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function EditProfile() {
   const Navigate = useNavigate();
