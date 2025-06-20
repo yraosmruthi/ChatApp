@@ -5,6 +5,8 @@ import { useUser } from "../context/userContext";
 import { useEffect } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
+const endpoint = import.meta.env.VITE_API_URL;
+
 export default function Login() {
   const navigate = useNavigate();
   const { fetchUser } = useUser(); 
@@ -40,15 +42,14 @@ export default function Login() {
   const handleLoginSubmit = async () => {
    
     try{
-      const response = await fetch("http://localhost:3000/api/auth/login",{
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json",
-
+      const response = await fetch(`${endpoint}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        credentials:"include",
-        body:JSON.stringify(loginData)
-      })
+        credentials: "include",
+        body: JSON.stringify(loginData),
+      });
 
       const result = await response.json()
       if(response.ok){
@@ -91,10 +92,10 @@ export default function Login() {
     formData.append("pic", signupData.profilePicture);
    }
 
-   const response = await fetch("http://localhost:3000/api/auth/register",{
-    method:"POST",
-    body:formData
-   })
+   const response = await fetch(`${endpoint}/api/auth/register`, {
+     method: "POST",
+     body: formData,
+   });
    const result = await response.json()      
    console.log(result)                   
    if(response.ok){

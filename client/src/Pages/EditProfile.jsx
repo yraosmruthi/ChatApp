@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
+const endpoint = import.meta.env.VITE_API_URL;
+
 export default function EditProfile() {
   const Navigate = useNavigate();
   const [newName, setNewName] = useState("");
@@ -18,7 +20,7 @@ export default function EditProfile() {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:3000/api/edit/update-name",
+        `${endpoint}/api/edit/update-name`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -49,7 +51,7 @@ export default function EditProfile() {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:3000/api/edit/update-email",
+        `${endpoint}/api/edit/update-email`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -82,14 +84,11 @@ export default function EditProfile() {
     formData.append("pic", profilePic);
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/edit/update-pic",
-        {
-          method: "POST",
-          credentials: "include",
-          body: formData,
-        }
-      );
+      const response = await fetch(`${endpoint}/api/edit/update-pic`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
 
       const result = await response.json()
       try{
@@ -117,15 +116,12 @@ export default function EditProfile() {
 
     setLoading(true);
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/edit/update-password",
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ oldPassword, newPassword }),
-        }
-      );
+      const response = await fetch(`${endpoint}/api/edit/update-password`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ oldPassword, newPassword }),
+      });
 
       const result = await response.json();
       if (response.ok) {
