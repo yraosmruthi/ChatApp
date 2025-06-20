@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { io } from "socket.io-client";
 import { FiTrash } from "react-icons/fi";
 
-const endpoint = "http://localhost:3000";
+const endpoint = import.meta.env.VITE_API_URL;
 
 const Chat = () => {
   const { user, isLoggedIn, logout, loading } = useUser();
@@ -287,7 +287,7 @@ const Chat = () => {
    const handleDeleteAccount = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:3000/api/auth/delete", {
+        const res = await fetch(`${endpoint}/api/auth/delete`, {
           method: "DELETE",
           credentials: "include",
         });
