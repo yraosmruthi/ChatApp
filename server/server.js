@@ -41,7 +41,12 @@ const io = new Server(server, {
   pingTimeout: 60000,
   pingInterval: 25000,
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://chatapp-1-td4o.onrender.com/",
+      "https://chatapp-67ws.onrender.com",
+    ],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "PATCH", "PUT", "OPTIONS"],
   },
