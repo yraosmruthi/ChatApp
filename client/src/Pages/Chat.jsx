@@ -254,10 +254,13 @@ const Chat = () => {
       socket.current.disconnect();
       socket.current = null;
     }
-
+  try{
     await logout();
-    toast.success("Logged out successfully");
     navigate("/");
+  } catch(error){
+    toast.error("logout failed, navigation skipped")
+    console.log(error)
+  }
   };
 
   const handleDelete = async (chatId) => {
