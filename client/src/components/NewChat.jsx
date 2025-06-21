@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useUser } from "../context/userContext";
 import { toast } from "react-toastify";
 
+const endpoint = import.meta.env.VITE_API_URL;
+
 const NewChat = ({ onChatStarted }) => {
   const { user } = useUser();
   const [search, setSearch] = useState("");
@@ -17,7 +19,7 @@ const NewChat = ({ onChatStarted }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/api/fetch/search?search=${query}`,
+        `${endpoint}/api/fetch/search?search=${query}`,
         { credentials: "include" }
       );
       const data = await res.json();
@@ -30,7 +32,7 @@ const NewChat = ({ onChatStarted }) => {
 
   const handleStartChat = async (userId) => {
     try {
-      const res = await fetch("http://localhost:3000/api/chat", {
+      const res = await fetch(`${endpoint}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 const UserContext = createContext();
+const endpoint = import.meta.env.VITE_API_URL;
 
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -9,7 +10,7 @@ const UserProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/auth/me", {
+      const res = await fetch(`${endpoint}/api/auth/me`, {
         method: "GET",
         credentials: "include",
       });

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useUser } from "../context/userContext";
 import { toast } from "react-toastify";
 
+const endpoint = import.meta.env.VITE_API_URL;
+
 const NewGroupChat = ({ onGroupCreated, onClose }) => {
   const { user } = useUser();
   const [allUsers, setAllUsers] = useState([]);
@@ -10,7 +12,7 @@ const NewGroupChat = ({ onGroupCreated, onClose }) => {
 
   const fetchAllUsers = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/fetch", {
+      const res = await fetch(`${endpoint}/api/fetch`, {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch users");
@@ -37,7 +39,7 @@ const NewGroupChat = ({ onGroupCreated, onClose }) => {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/chat/group", {
+      const res = await fetch(`${endpoint}/api/chat/group`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
