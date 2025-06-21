@@ -44,7 +44,7 @@ const io = new Server(server, {
     origin: [
       "http://localhost:5173",
       "http://localhost:3000",
-      "https://chatapp-1-td4o.onrender.com/",
+      "https://chatapp-1-td4o.onrender.com",
       "https://chatapp-67ws.onrender.com",
     ],
     credentials: true,
