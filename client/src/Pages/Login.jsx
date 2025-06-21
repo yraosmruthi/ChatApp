@@ -95,6 +95,7 @@ export default function Login() {
    const response = await fetch(`${endpoint}/api/auth/register`, {
      method: "POST",
      body: formData,
+     credentials: "include",
    });
    const result = await response.json()      
    console.log(result)                   
