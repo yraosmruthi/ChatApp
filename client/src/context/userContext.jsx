@@ -34,7 +34,7 @@ const UserProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/auth/logout", {
+      const res = await fetch(`${endpoint}api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
