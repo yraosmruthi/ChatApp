@@ -35,11 +35,12 @@ const userLogin = async (req, res) => {
       });
       const token = generateToken(userExist);
       res.cookie("token", token, {
-        httpOnly: true, 
-        secure: false, 
-        sameSite: "lax", 
-        maxAge: 7 * 24 * 60 * 60 * 1000, 
+        httpOnly: true,
+        secure: true, // ✅ must be true for cross-site cookie on HTTPS
+        sameSite: "None", // ✅ must be "None" for cross-site cookie
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
+      
       return res.status(200).json({
         msg: "user logged in successfully",
         token,
@@ -54,11 +55,12 @@ const userLogin = async (req, res) => {
     if (result) {
       const token = generateToken(userExist);
       res.cookie("token", token, {
-        httpOnly: true, 
-        secure: false, 
-        sameSite: "lax", 
-        maxAge: 7 * 24 * 60 * 60 * 1000, 
+        httpOnly: true,
+        secure: true, // ✅ must be true for cross-site cookie on HTTPS
+        sameSite: "None", // ✅ must be "None" for cross-site cookie
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
+      
       return res.status(200).json({
         msg: "user logged in successfully",
         token,
@@ -113,7 +115,12 @@ const userRegister = async (req, res) => {
 
 const userLogout = async(req,res)=>{
   try{
-   res.clearCookie("token")
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
+    
    res.status(200).json({msg:"logged out successfully"})
   }catch(error){
     console.log(error);
