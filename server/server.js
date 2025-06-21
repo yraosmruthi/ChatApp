@@ -17,7 +17,7 @@ const server = createServer(app);
 
 app.use(
   cors({
-    origin: "https://chatapp-1-td4o.onrender.com/",
+    origin: "https://chatapp-1-td4o.onrender.com",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
