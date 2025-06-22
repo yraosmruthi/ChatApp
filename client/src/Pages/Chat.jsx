@@ -221,7 +221,7 @@ const Chat = () => {
         socket.current = null;
       }
     };
-  }, [isLoggedIn, user, loading,chats]);
+  }, [isLoggedIn, user, loading]);
 
   // Handle navigation based on authentication
   useEffect(() => {

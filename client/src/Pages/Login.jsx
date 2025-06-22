@@ -101,6 +101,8 @@ export default function Login() {
    console.log(result)                   
    if(response.ok){
     toast.success("Sign up success,now Login");
+    await fetchUser();
+    navigate("/chat");
    }else{
     console.log(result)
     toast.error(
