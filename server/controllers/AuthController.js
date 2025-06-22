@@ -103,7 +103,17 @@ const userRegister = async (req, res) => {
       password: hash,
       pic: uploadImageUrl,
     });
+
     console.log(createUser)
+
+    const token = generateToken(createUser);
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true, // ✅ must be true for cross-site cookie on HTTPS
+      sameSite: "None", // ✅ must be "None" for cross-site cookie
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     return res
       .status(200)
       .json({ msg: "user created successfully", createUser });
