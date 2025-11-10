@@ -78,7 +78,7 @@ const editPic = async (req, res) => {
     }
 
     const result = await cloudinary.uploader.upload(file.path);
-    console.log("Cloudinary upload success:", result);
+    console.log("Cloudinary upload success:");
 
     // Delete local file
     fs.unlink(file.path, (err) => {

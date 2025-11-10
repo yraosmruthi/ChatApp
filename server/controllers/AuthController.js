@@ -14,7 +14,6 @@ cloudinary.config({
 }
 );
 
-console.log("Cloudinary config set to:", cloudinary.config());
 
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
