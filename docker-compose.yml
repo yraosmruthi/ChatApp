@@ -1,0 +1,25 @@
+services:
+  client:
+    build:
+      context: ./client
+      args:
+        - VITE_API_URL=http://localhost:3000
+    ports:
+      - "5000:80"
+    depends_on:
+      - server
+
+  server:
+    build: ./server                                              
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=${PORT}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - MONGO_URI=${MONGO_URI}
+      - NODE_ENV=${NODE_ENV}
+      - CLOUD_NAME=${CLOUD_NAME}
+      - API_KEY=${API_KEY}
+      - API_SECRET=${API_SECRET}
+
+  

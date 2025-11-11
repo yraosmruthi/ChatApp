@@ -17,7 +17,10 @@ const server = createServer(app);
 
 app.use(
   cors({
-    origin: "https://chatapp-1-td4o.onrender.com",
+    origin: [
+      "https://chatapp-1-td4o.onrender.com",
+      "http://localhost:5000"
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -46,6 +49,7 @@ const io = new Server(server, {
       "http://localhost:3000",
       "https://chatapp-1-td4o.onrender.com",
       "https://chatapp-67ws.onrender.com",
+      "http://localhost:5000",
     ],
     credentials: true,
     methods: ["GET", "POST", "DELETE", "PATCH", "PUT", "OPTIONS"],
