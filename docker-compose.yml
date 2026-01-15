@@ -3,7 +3,8 @@ services:
     build:
       context: ./client
       args:
-        - VITE_API_URL=http://localhost:3000
+        - VITE_API_URL=http://mychatappingress.com/api #value must be changed as required and updated in server.js for CORS     
+
     ports:
       - "5000:80"
     depends_on:

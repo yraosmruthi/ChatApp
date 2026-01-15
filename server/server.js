@@ -19,7 +19,8 @@ app.use(
   cors({
     origin: [
       "https://chatapp-1-td4o.onrender.com",
-      "http://localhost:5000"
+      "http://localhost:5000",
+      "http://mychatappingress.com:8080"
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],

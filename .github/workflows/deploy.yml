@@ -1,0 +1,25 @@
+name: Integrate
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+        
+    steps:
+      - uses: actions/checkout@v4
+      - name: ssh deployment
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{secrets.SERVER_IP}}
+          username: ec2-user
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          script: |
+            cd /home/ec2-user/app/ChatApp
+            git pull origin main
+            docker compose down
+            docker compose up -d --build
+
+      
