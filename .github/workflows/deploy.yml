@@ -21,5 +21,14 @@ jobs:
             git pull origin main
             docker compose down
             docker compose up -d --build
+      - name: deploy to k8
+        uses: appleboy/kubectl-action@v1.0.0
+        with:
+          args: apply -f kubernetes/
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG }}
+
+      
+        
 
       
