@@ -23,11 +23,9 @@ jobs:
             docker compose up -d --build
       - name: deploy to k8
         uses: azure/setup-kubectl@v4
-        with:
-          args: apply -f kubernetes/
         env:
           KUBECONFIG: ${{ secrets.KUBECONFIG }}
-
+        run: kubectl -f kubernetes/
       
         
 
