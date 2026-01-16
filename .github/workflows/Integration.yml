@@ -33,6 +33,6 @@ jobs:
         working-directory: server
 
       - name: "build command of server"
-        run: npm run build
+        run: node server.js
         working-directory: server
       
