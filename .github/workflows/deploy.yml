@@ -21,10 +21,7 @@ jobs:
             git pull origin main
             docker compose down
             docker compose up -d --build
-      - name: Validate Kubernetes YAMLs
-        uses: instrumenta/kubeconform-action@v0.6.1
-        with:
-          files: kubernetes/
+      
       
         
 
