@@ -16,9 +16,20 @@ jobs:
         with:
           node-version: ${{matrix.node-version}}
           cache: 'npm'
-      - name: "dependencies installed"
+          
+      - name: "dependencies of client installed"
         run: npm i
+        working-directory: client
 
-      - name: "build command"
+      - name: "build command of client"
         run: npm run build
+        working-directory: client
+
+      - name: "dependencies of server installed"
+        run: npm i
+        working-directory: server
+
+      - name: "build command of server"
+        run: npm run build
+        working-directory: server
       
