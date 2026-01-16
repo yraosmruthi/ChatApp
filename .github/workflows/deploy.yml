@@ -24,7 +24,9 @@ jobs:
       - name: setup  k8
         uses: azure/setup-kubectl@v4
       - name: deploy k8
-        run: kubectl apply -f kubernetes/ --dry-run=client --validate=false
+        run: |
+          export KUBECONFIG=/dev/null
+          kubectl apply -f kubernetes/ --dry-run=client --validate=false
       
         
 
