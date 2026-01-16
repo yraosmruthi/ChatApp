@@ -21,12 +21,10 @@ jobs:
             git pull origin main
             docker compose down
             docker compose up -d --build
-      - name: setup  k8
-        uses: azure/setup-kubectl@v4
-      - name: deploy k8
-        run: |
-          export KUBECONFIG=/dev/null
-          kubectl apply -f kubernetes/ --dry-run=client --validate=false
+      - name: Validate Kubernetes YAMLs
+        uses: instrumenta/kubeconform-action@v0.6.1
+        with:
+          files: kubernetes/
       
         
 
